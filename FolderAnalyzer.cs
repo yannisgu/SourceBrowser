@@ -36,6 +36,7 @@ namespace SourceBrowser.Generator
                 filePathParts.Add(doc.Project.Name);
                 filePathParts.AddRange(doc.Folders);
 
+                //We build up a path to the document's location
                 foreach (var part in filePathParts)
                 {
                     if (!currentPosition.Children.ContainsKey(part))
@@ -46,7 +47,9 @@ namespace SourceBrowser.Generator
 
                     currentPosition = currentPosition.Children[part] as FolderItem;
                 }
-
+                
+                //Finally, currentPosition points to the document's containing folder.
+                //We add it to it's children.
                 var fileName = doc.Name;
                 var file = new FileItem(fileName);
                 currentPosition.Children[fileName] = file;

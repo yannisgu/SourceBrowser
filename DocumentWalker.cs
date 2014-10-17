@@ -30,9 +30,9 @@ namespace SourceBrowser.Generator
             return DocInfo;
         }
 
-        public DocumentWalker(SemanticModel model, Document document, Dictionary<string, string> typeLookup) : base(SyntaxWalkerDepth.Trivia)
+        public DocumentWalker(Document document, Dictionary<string, string> typeLookup) : base(SyntaxWalkerDepth.Trivia)
         {
-            _model = model;
+            _model = document.GetSemanticModelAsync().Result;
             _typeLookup = typeLookup;
             FilePath = document.GetRelativeFilePath();
 

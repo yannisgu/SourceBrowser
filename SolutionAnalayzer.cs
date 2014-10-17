@@ -151,8 +151,7 @@ namespace SourceBrowser.Generator
         private DocumentInfo buildDocumentInfo(Document document)
         {
             var root = document.GetSyntaxRootAsync().Result;
-            var model = document.GetSemanticModelAsync().Result;
-            var docWalker = new DocumentWalker(model, document, _typeLookup);
+            var docWalker = new DocumentWalker(document, _typeLookup);
             docWalker.Visit(root);
 
             var docInfo = docWalker.GetDocumentInfo();

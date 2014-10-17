@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json.Linq;
+using SourceBrowser.Generator.Extensions;
 
 namespace SourceBrowser.Generator
 {
@@ -26,8 +27,8 @@ namespace SourceBrowser.Generator
         /// <returns>The root node of the file system tree.</returns>
         public FolderItem AnalzeSolutionStructure()
         {
-            //var solutionName = Path.GetFileName()
-            var folderRoot = new FolderItem("test");
+            var solutionName = _solution.GetName();
+            var folderRoot = new FolderItem(solutionName);
             foreach (var doc in _solution.Projects.SelectMany(n => n.Documents))
             {
                 var currentPosition = folderRoot;

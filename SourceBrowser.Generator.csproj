@@ -112,9 +112,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocumentExtensions.cs" />
+    <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="DocumentInfo.cs" />
     <Compile Include="DocumentWalker.cs" />
+    <Compile Include="Extensions\SolutionExtensions.cs" />
     <Compile Include="FolderAnalyzer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

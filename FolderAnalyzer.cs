@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace SourceBrowser.Generator
         /// <returns>The root node of the file system tree.</returns>
         public FolderItem AnalzeSolutionStructure()
         {
+            //var solutionName = Path.GetFileName()
             var folderRoot = new FolderItem("test");
             foreach (var doc in _solution.Projects.SelectMany(n => n.Documents))
             {
@@ -51,5 +53,6 @@ namespace SourceBrowser.Generator
 
             return folderRoot;
         }
+
     }
 }

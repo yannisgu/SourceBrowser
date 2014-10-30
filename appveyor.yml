@@ -1,0 +1,9 @@
+version: 0.{build}
+
+branches:
+  # blacklist
+  except:
+    - gh-pages
+
+build_script:
+    - ps: ./build.ps1

@@ -53,14 +53,14 @@ Target "Versioning" (fun _ ->
 
   let servers = GitVersion.BuildServerList.GetApplicableBuildServers(GitVersion.Authentication())
 
-  //for server in servers do
-  //  server.PerformPreProcessingSteps (dir) |> ignore
+  for server in servers do
+    server.PerformPreProcessingSteps (dir) |> ignore
 
 
   semanticVersion <- GitVersionFinder.GetSemanticVersion(repo)
 
-  //for server in servers do
-//    server.WriteIntegration(semanticVersion, action) |> ignore
+  for server in servers do
+    server.WriteIntegration(semanticVersion, action) |> ignore
 
   semanticVersionVariables <- VariableProvider.GetVariablesFor(semanticVersion)
 

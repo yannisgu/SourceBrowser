@@ -18,5 +18,7 @@ $fake = "$buildFolder\packages\FAKE\tools\Fake.exe"
 
 & $fake "$buildFolder\build.fsx"
 if($LASTEXITCODE -ne 0) {
-  Write-Error "Fake failed"
+  if($env:APPVEYOR) {
+    exit 1
+  }
 }

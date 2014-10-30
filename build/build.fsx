@@ -14,6 +14,8 @@ let solution = ("../src/SourceBrowser.sln" |> FullNameFromHere)
 
 let mutable semanticVersion : SemanticVersion = null
 let mutable semanticVersionVariables : Dictionary<string, string> = null
+let mutable nugetVersion : string = ""
+
 
 Target "Restore" (fun _ ->
   CustomRestorePackage  solution
@@ -51,14 +53,14 @@ Target "Versioning" (fun _ ->
 
   let servers = GitVersion.BuildServerList.GetApplicableBuildServers(GitVersion.Authentication())
 
-  for server in servers do
-    server.PerformPreProcessingSteps (dir) |> ignore
+  //for server in servers do
+  //  server.PerformPreProcessingSteps (dir) |> ignore
 
 
   semanticVersion <- GitVersionFinder.GetSemanticVersion(repo)
 
-  for server in servers do
-    server.WriteIntegration(semanticVersion, action) |> ignore
+  //for server in servers do
+//    server.WriteIntegration(semanticVersion, action) |> ignore
 
   semanticVersionVariables <- VariableProvider.GetVariablesFor(semanticVersion)
 
@@ -72,12 +74,26 @@ Target "Versioning" (fun _ ->
 )
 
 Target "Pack" (fun _ ->
-    CusomtNuGetPack ("../src/SourceBrowser.Generator/SourceBrowser.Generator.csproj" |> FullNameFromHere) (sprintf "%s-beta"semanticVersionVariables.["NuGetVersionV2"]) "Release"
+    nugetVersion <- (sprintf "%s-beta"semanticVersionVariables.["NuGetVersionV2"])
+    CusomtNuGetPack ("../src/SourceBrowser.Generator/SourceBrowser.Generator.csproj" |> FullNameFromHere) nugetVersion "Release"
 )
 
 Target "Test" (fun _ ->
     trace "test stuff..."
 
+)
+
+Target "Publish" (fun _ ->
+    let setParams (defaults : NuGetParams) =
+          { defaults with
+               AccessKey = environVar "NUGET_APIKEY"
+               OutputPath = (".." |> FullNameFromHere)
+               WorkingDir = (".." |> FullNameFromHere)
+               Project = "SourceBrowser.Generator"
+               Version = nugetVersion
+           }
+
+    NuGetPublish setParams
 )
 
 
@@ -93,4 +109,10 @@ Target "Test" (fun _ ->
 "Build"
    ==> "Pack"
 
-Run "Pack"
+"Pack"
+   ==> "Publish"
+
+if((environVar "APPVEYOR_REPO_TAG") = "True") then
+  Run "Publish"
+else
+  Run "Pack"

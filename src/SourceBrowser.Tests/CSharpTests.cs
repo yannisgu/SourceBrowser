@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.CodeAnalysis.UnitTests;
 using Microsoft.CodeAnalysis.UnitTests.SolutionGeneration;
 using Microsoft.CodeAnalysis;
@@ -7,13 +6,14 @@ using System.Linq;
 using SourceBrowser.Generator.Model;
 using SourceBrowser.Generator;
 using SourceBrowser.Generator.Model.CSharp;
+using Xunit;
+using Xunit.Sdk;
 
 namespace SourceBrowser.Tests
 {
-    [TestClass]
     public class CSharpTests : MSBuildWorkspaceTestBase
     {
-        [TestMethod]
+        [Fact]
         public void SanityCheck()
         {
             //Set up the absolute minimum
@@ -40,16 +40,16 @@ namespace SourceBrowser.Tests
             var documentModel = walker.GetDocumentModel();
 
             //Make sure there's 12 tokens
-            Assert.IsTrue(documentModel.Tokens.Count == 12);
+            Assert.True(documentModel.Tokens.Count == 12);
 
             //Make sure they're classified correctly
-            Assert.IsTrue(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.KEYWORD) == 3);
-            Assert.IsTrue(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.TYPE) == 1);
-            Assert.IsTrue(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.IDENTIFIER) == 1);
-            Assert.IsTrue(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.OTHER) == 7);
+            Assert.True(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.KEYWORD) == 3);
+            Assert.True(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.TYPE) == 1);
+            Assert.True(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.IDENTIFIER) == 1);
+            Assert.True(documentModel.Tokens.Count(n => n.Type == CSharpTokenTypes.OTHER) == 7);
         }
 
-        [TestMethod]
+        [Fact]
         public void BasicLinking()
         {
             var solution = base.Solution(
@@ -82,18 +82,18 @@ namespace SourceBrowser.Tests
 
             //Make sure there's two links
             var links = documentModel.Tokens.Select(n => n.Link).Where(n => n != null);
-            Assert.IsTrue(links.Count() == 5);
+            Assert.True(links.Count() == 5);
 
             //Make sure they're all symbol links
-            Assert.IsTrue(links.All(n => n is SymbolLink));
+            Assert.True(links.All(n => n is SymbolLink));
 
             //Make sure they link correctly
-            Assert.IsTrue(links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1.Method1()") == 2);
-            Assert.IsTrue(links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1.Method2()") == 2);
-            Assert.IsTrue(links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1") == 1);
+            Assert.Equal(2, links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1.Method1()"));
+            Assert.Equal(2, links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1.Method2()"));
+            Assert.Equal(1, links.Count(n => ((SymbolLink)(n)).ReferencedSymbolName == "C1"));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestParameters()
         {
             var solution = base.Solution(
@@ -125,16 +125,16 @@ namespace SourceBrowser.Tests
             var links = documentModel.Tokens.Select(n => n.Link).Where(n => n != null);
             var symbolLinks = links.Select(n => n as SymbolLink);
 
-            Assert.IsTrue(links.Count() == 9);
+            Assert.Equal(9, links.Count());
 
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1").Count() == 2);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p1").Count() == 2);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p2").Count() == 2);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p3").Count() == 2);
+            Assert.Equal(2, symbolLinks.Where(n => n.ReferencedSymbolName == "C1").Count());
+            Assert.Equal(1, symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)").Count());
+            Assert.Equal(2, symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p1").Count());
+            Assert.Equal(2, symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p2").Count());
+            Assert.Equal(2, symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1(string, int, C1)::p3").Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestLocals()
         {
             var solution = base.Solution(
@@ -168,15 +168,15 @@ namespace SourceBrowser.Tests
             var links = documentModel.Tokens.Select(n => n.Link).Where(n => n != null);
             var symbolLinks = links.Select(n => n as SymbolLink);
 
-            Assert.IsTrue(links.Count() == 8);
+            Assert.True(links.Count() == 8);
 
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()::l1").Count() == 3);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()::l2").Count() == 3);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "C1").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()::l1").Count() == 3);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "C1.M1()::l2").Count() == 3);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestExtensionMethods()
         {
             var solution = base.Solution(
@@ -214,13 +214,13 @@ namespace SourceBrowser.Tests
             var links = documentModel.Tokens.Select(n => n.Link).Where(n => n != null);
             var symbolLinks = links.Select(n => n as SymbolLink);
 
-            Assert.IsTrue(symbolLinks.Count() == 6);
+            Assert.True(symbolLinks.Count() == 6);
 
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions.ExtensionMethod(string)").Count() == 2);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions.ExtensionMethod(string)::myParam").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "MyClass").Count() == 1);
-            Assert.IsTrue(symbolLinks.Where(n => n.ReferencedSymbolName == "MyClass.MyMethod()").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions.ExtensionMethod(string)").Count() == 2);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "MyExtensions.ExtensionMethod(string)::myParam").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "MyClass").Count() == 1);
+            Assert.True(symbolLinks.Where(n => n.ReferencedSymbolName == "MyClass.MyMethod()").Count() == 1);
         }
     }
 }

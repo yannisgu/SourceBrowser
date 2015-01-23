@@ -6,6 +6,7 @@ open Fake
 open Fake.NuGet.Install
 open System.Collections.Generic
 open System
+open Fake.XUnit2Helper
 
 #load "helpers.fsx"
 open Helpers
@@ -78,9 +79,16 @@ Target "Pack" (fun _ ->
     CusomtNuGetPack ("../src/SourceBrowser.Generator/SourceBrowser.Generator.csproj" |> FullNameFromHere) nugetVersion "Release"
 )
 
-Target "Test" (fun _ ->
-    trace "test stuff..."
+let testDlls = !! ("./**/bin/**/*.Tests.dll")
 
+Target "Test" (fun _ ->
+    testDlls
+        |> xUnit2 (fun p ->
+            {p with
+                HtmlOutput = true;
+                XmlOutput = true;
+                ToolPath = "./src/packages/xunit.runners.2.0.0-rc1-build2826/tools/xunit.console.exe";
+                OutputDir = "." })
 )
 
 Target "Publish" (fun _ ->
@@ -106,7 +114,7 @@ Target "Publish" (fun _ ->
 "Versioning"
    ==> "Build"
 
-"Build"
+"Test"
    ==> "Pack"
 
 "Pack"
